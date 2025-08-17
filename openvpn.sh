@@ -16,11 +16,50 @@ else
     cd - >/dev/null
 fi
 
-OVPN_FILE="$1"
 
-if [ -z "$OVPN_FILE" ]; then
-    echo "Usage: $0 <ovpn_file>"
+# Gestion intelligente de la sélection de fichier OVPN
+# Gestion intelligente de la sélection de fichier OVPN
+AUTOCHOOSE=0
+INPUT_ARG=""
+
+# Parse les arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --autochoose)
+            AUTOCHOOSE=1
+            shift
+            ;;
+        *)
+            INPUT_ARG="$1"
+            shift
+            ;;
+    esac
+done
+
+if [ -z "$INPUT_ARG" ] || [ "$INPUT_ARG" = "--help" ]; then
+    echo "Usage: $0 [--autochoose] <JP|KR|VN|RU|TH|US>"
     exit 1
+fi
+
+# Si l'argument ne contient pas de slash, on cherche dans auto-ovpn/configs/
+if [[ "$INPUT_ARG" != */* ]]; then
+    MATCHES=(auto-ovpn/configs/*"$INPUT_ARG".ovpn)
+    if [ ${#MATCHES[@]} -eq 0 ] || [ ! -e "${MATCHES[0]}" ]; then
+        echo "No file found for pattern: $INPUT_ARG"
+        exit 1
+    elif [ ${#MATCHES[@]} -eq 1 ] || [ "$AUTOCHOOSE" -eq 1 ]; then
+        OVPN_FILE="${MATCHES[0]}"
+        echo "File automatically selected: $OVPN_FILE"
+    else
+        echo "Multiple files found:"
+        select OVPN_FILE in "${MATCHES[@]}"; do
+            if [ -n "$OVPN_FILE" ]; then
+                break
+            fi
+        done
+    fi
+else
+    OVPN_FILE="$INPUT_ARG"
 fi
 
 if [ ! -f "$OVPN_FILE" ]; then
@@ -39,7 +78,7 @@ echo "Using modified OVPN config (cipher -> data-ciphers):"
 grep -i 'data-ciphers' "$TMP_OVPN"
 
 # Lancer OpenVPN avec ce fichier temporaire
-sudo openvpn --config "$TMP_OVPN"
+sudo openvpn --config "$TMP_OVPN" --verb 0
 
 # Supprimer le fichier temporaire après usage
 rm -f "$TMP_OVPN"
