@@ -21,9 +21,19 @@ if (-not (Test-Path $RepoDir)) {
     Pop-Location
 }
 
+# Interface graphique si aucun argument
 if (-not $InputArg -or $InputArg -eq "--help") {
-    Write-Host "Usage: .\openvpn.ps1 [-AutoChoose] <JP|KR|VN|RU|TH|US>"
-    exit 1
+    Add-Type -AssemblyName System.Windows.Forms
+    $dialog = New-Object System.Windows.Forms.OpenFileDialog
+    $dialog.InitialDirectory = "$PWD\$RepoDir\configs"
+    $dialog.Filter = "OpenVPN config (*.ovpn)|*.ovpn"
+    $dialog.Title = "Sélectionnez un fichier de configuration OpenVPN"
+    if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+        $InputArg = $dialog.FileName
+    } else {
+        Write-Host "Aucun fichier sélectionné. Abandon."
+        exit 1
+    }
 }
 
 # Find matching OVPN files

@@ -11,13 +11,12 @@ else
     LOCAL=$(git rev-parse @)
     REMOTE=$(git rev-parse @{u})
     if [ "$LOCAL" != "$REMOTE" ]; then
-        git pull --quiet
+        git pull --quiet --rebase origin main
     fi
     cd - >/dev/null
 fi
 
 
-# Gestion intelligente de la sélection de fichier OVPN
 # Gestion intelligente de la sélection de fichier OVPN
 AUTOCHOOSE=0
 INPUT_ARG=""
