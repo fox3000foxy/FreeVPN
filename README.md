@@ -1,6 +1,7 @@
-# UPDATE NOTICE
-This project is deprecated. [This](https://github.com/Croissant-API/Croissant-VPN) one is a better version of it.
-You can still continue to use this one as before but it will not be longer maintened.
+> [!WARNING]  
+> # UPDATE NOTICE
+> This project is deprecated. [This](https://github.com/Croissant-API/Croissant-VPN) one is a better version of it.
+> You can still continue to use this one as before but it will not be longer maintened.
 
 ---
 
